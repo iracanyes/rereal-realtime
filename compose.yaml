@@ -1,9 +1,45 @@
 services:
   postgres:
     image: 'postgres:latest'
+    restart: always
+    build:
+      context: ./
+      #dockerfile: ./Dockerfile
+    # set shared memory limit when using docker-compose
+    shm_size: '256mb'
+    env_file:
+      - ./.env
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      # Specifies a name for your database
+      POSTGRES_DB: ${REALTIME_API_POSTGRES_ROOT_DB:? Container 'jenycx-bnc-data-db' env var 'REALTIME_API_POSTGRES_ROOT_DB' is not set}
+      # Specifies a user with superuser privilege
+      POSTGRES_USER: ${REALTIME_API_POSTGRES_ROOT_USERNAME:? Container 'jenycx-bnc-data-db' env var 'REALTIME_API_POSTGRES_ROOT_USERNAME' is not set}
+      POSTGRES_PASSWORD: ${REALTIME_API_POSTGRES_ROOT_PASSWORD:? Container 'jenycx-bnc-data-db' env var 'REALTIME_API_POSTGRES_ROOT_PASSWORD' is not set}
+      # Recommended: Docker Secret
+      #POSTGRES_PASSWORD_FILE: /run/secrets/postgres-passwd
+      # Sends arguments to postgres_initdb and adds functionality
+      # This optional environment variable can be used to send arguments to postgres initdb
+      # We set the page checksums, the authentication method, the locales, SHM file size
+      POSTGRES_INITDB_ARGS: "--data-checksums --auth-host=scram-sha-256 --locale-provider=icu --icu-locale=fr-FR"
+      #  Defines a specific directory for the Postgres transaction log.
+      # A transaction is an operation and usually describes a change to your database.
+      #POSTGRES_INITDB_WALDIR: ""
+      #
+      # Controls the auth-method for host connections to all databases, users, and addresses
+      #POSTGRES_HOST_AUTH_METHOD: ""
+      # Defines another default location or subdirectory for database files
+      PGDATA: "/var/lib/pgdata"
+    volumes:
+      # Configuration file
+      - ./docker/postgres/config/my-postgres.conf:/etc/postgresql/postgresql.conf
+      # Local storage
+      - ./data/postgres/data:/var/lib/pgdata
+      # Additional initialization script
+      - ./docker/postgres/init/init-app-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
     ports:
-      - '5432'
+      - "54321:5432"
