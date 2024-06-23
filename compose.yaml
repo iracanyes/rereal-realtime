@@ -24,7 +24,6 @@ services:
       #  Defines a specific directory for the Postgres transaction log.
       # A transaction is an operation and usually describes a change to your database.
       #POSTGRES_INITDB_WALDIR: ""
-      #
       # Controls the auth-method for host connections to all databases, users, and addresses
       #POSTGRES_HOST_AUTH_METHOD: ""
       # Defines another default location or subdirectory for database files
