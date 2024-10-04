@@ -9,7 +9,7 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.euroskyestarr.euro.rereal</groupId>
-  <artifactId>realtime-api</artifactId>
+  <artifactId>rereal-realtime</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>realtime-api</name>
   <description>realtime-api</description>
